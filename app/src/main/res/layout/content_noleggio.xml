@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/frameLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/lightbackground"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".NoleggioActivity"
+    tools:showIn="@layout/activity_noleggio">
+
+
+    <LinearLayout
+        android:id="@+id/configurazioneLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="visible">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:layout_weight="1"
+            android:gravity="bottom"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/veicoloText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:gravity="center"
+                android:hint="INSERISCI CODICE"
+                android:inputType="number"
+                android:singleLine="true"
+                android:textSize="36sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@+id/veicoloButton"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/veicoloButton"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:onClick="confermaVeicolo"
+                android:text="CONFERMA VEICOLO"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/veicoloText" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayout7"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.4"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/configurazioneLayout">
+
+            <EditText
+                android:id="@+id/scontoText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:hint="Inserisci sconto"
+                android:inputType="textPersonName" />
+
+            <Button
+                android:id="@+id/scontoButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="confermaSconto"
+                android:text="Applica" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="bottom"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/avviaNoleggioButton"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:layout_marginBottom="32dp"
+                android:onClick="confermaNoleggio"
+                android:text="AVVIA NOLEGGIO" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/noleggioLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <net.crosp.libs.android.circletimeview.CircleTimeView
+            android:id="@+id/timerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.9"
+            app:ctvCircleButtonColor="#099ef4"
+            app:ctvCircleColor="@color/colorPrimaryDark"
+            app:ctvCircleHandButtonRadius="10dp"
+            app:ctvCirclePressedButtonColor="#08bfdf"
+            app:ctvCircleStrokeWidth="1dp"
+            app:ctvCurrentTimeInSeconds="160"
+            app:ctvHighlightMarkLineColor="@color/colorPrimary"
+            app:ctvLabelText="NOLEGGIO IN CORSO"
+            app:ctvLabelTextColor="@color/colorAccent"
+            app:ctvLabelTextSize="18sp"
+            app:ctvLapBackgroundColor="@color/colorAccent"
+            app:ctvLapLabelMarginTop="15dp"
+            app:ctvLapLabelTextSize="12sp"
+            app:ctvLapTextColor="#fff"
+            app:ctvMarginTopLabel="22dp"
+            app:ctvMarkLineColor="#ffcdd2"
+            app:ctvMarkLineWidth="1dp"
+            app:ctvMarkSize="10dp"
+            app:ctvMinutesMarkCount="120"
+            app:ctvMultiLapRotation="true"
+            app:ctvPaddingInnerRadius="15dp"
+            app:ctvPaddingQuarterNumber="5dp"
+            app:ctvQuarterMarkSize="20dp"
+            app:ctvQuarterNumberColor="@color/colorAccent"
+            app:ctvQuarterNumberTextSize="16sp"
+            app:ctvShowLaps="true"
+            app:ctvTimeFormat="seconds_minutes"
+            app:ctvTimeMode="manual"
+            app:ctvTimeNumberColor="@color/colorPrimaryDark"
+            app:ctvTimeNumbersTextSize="55sp" />
+
+        <Button
+            android:id="@+id/terminaNoleggioButton"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="TERMINA NOLEGGIO" />
+
+    </LinearLayout>
+
+
+</FrameLayout>

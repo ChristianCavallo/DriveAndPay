@@ -5,6 +5,9 @@
  */
 package com.example.drivepay.Connection;
 
+import android.os.Handler;
+import android.os.Looper;
+
 import org.apache.commons.lang3.SerializationUtils;
 
 import java.io.DataInputStream;
@@ -47,7 +50,7 @@ public class TestClient extends Thread {
             this.sock = new Socket(this.ip, this.port);
             this.sock.setKeepAlive(true);
         } catch (IOException ex) {
-            ex.printStackTrace();
+
         }
         try {
           SendCommand(new Command(CommandsEnum.CommandType.HANDSHAKE_REQUEST, null));
@@ -68,16 +71,7 @@ public class TestClient extends Thread {
                 data = encryption.decryptAES(data);
                 Command cmd = SerializationUtils.deserialize(data);
                 executeCommand(cmd);
-                if(listeners.size() > 0) {
-                    for (Iterator iterator = listeners.iterator(); iterator.hasNext(); ) {
-                        OnCommandReceivedListener next = (OnCommandReceivedListener) iterator.next();
-                        if (next != null) {
-                            next.OnCommandReceivedCallback(cmd);
-                        } else {
-                            listeners.remove(next);
-                        }
-                    }
-                }
+                notifyListeners(cmd);
                 System.out.println("Ho ricevuto un messaggio: " + cmd.toString());
 
             }
@@ -95,6 +89,27 @@ public class TestClient extends Thread {
         }).start();
     }
 
+    public void notifyListeners(Command c) {
+        final Command cmd = c;
+        Handler mainHandler = new Handler(Looper.getMainLooper());
+
+        Runnable myRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (listeners.size() > 0) {
+                    for (Iterator iterator = listeners.iterator(); iterator.hasNext(); ) {
+                        OnCommandReceivedListener next = (OnCommandReceivedListener) iterator.next();
+                        if (next != null) {
+                            next.OnCommandReceivedCallback(cmd);
+                        } else {
+                            listeners.remove(next);
+                        }
+                    }
+                }
+            }
+        };
+        mainHandler.post(myRunnable);
+    }
     public void RecoverConnection(){
         while(true){
             try {
@@ -104,11 +119,13 @@ public class TestClient extends Thread {
                 new Thread(this).start();
                 break;
             } catch (IOException ex) {
-                ex.printStackTrace();
+                System.out.println("Errore di connessione: " + ex.getMessage());
+
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
+        Thread.currentThread().interrupt();
     }
 
     public void SendCommand(Command cmd) {

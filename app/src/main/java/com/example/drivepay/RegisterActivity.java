@@ -1,58 +1,37 @@
 package com.example.drivepay;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.hardware.Camera;
-import android.media.Image;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.design.widget.TabLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
-
 
 import com.example.drivepay.Connection.OnCommandReceivedListener;
-
+import com.jeevandeshmukh.glidetoastlib.GlideToast;
 
 import org.apache.commons.validator.routines.EmailValidator;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.Period;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 import SerializedObjects.Command;
 import SerializedObjects.CommandsEnum;
@@ -101,17 +80,17 @@ public class RegisterActivity extends AppCompatActivity implements OnCommandRece
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registrazione);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager = findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        TabLayout tabLayout = findViewById(R.id.tabs);
 
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
@@ -139,8 +118,8 @@ public class RegisterActivity extends AppCompatActivity implements OnCommandRece
     }
 
     public void pickImage(int tipo){
-        cartaView = (ImageView) findViewById(R.id.imageViewCarta);
-        patenteView = (ImageView) findViewById(R.id.imageViewPatente);
+        cartaView = findViewById(R.id.imageViewCarta);
+        patenteView = findViewById(R.id.imageViewPatente);
         EasyImage.openGallery(this, tipo);
     }
 
@@ -221,16 +200,16 @@ public class RegisterActivity extends AppCompatActivity implements OnCommandRece
     }
 
     public void AnnullaRegistrazione(View view){
-        mViewPager.setCurrentItem(2);
+        finish();
     }
 
     public void AvantiFase1(View view){
-        emailView = (EditText) findViewById(R.id.emailText);
-        passwordView = (EditText) findViewById(R.id.passwordText);
-        nomeView = (EditText) findViewById(R.id.nameText);
-        cognomeView = (EditText) findViewById(R.id.surnameText);
-        nascitaView = (EditText) findViewById(R.id.dateText);
-        cfView = (EditText) findViewById(R.id.cfText);
+        emailView = findViewById(R.id.emailText);
+        passwordView = findViewById(R.id.passwordText);
+        nomeView = findViewById(R.id.nameText);
+        cognomeView = findViewById(R.id.surnameText);
+        nascitaView = findViewById(R.id.dateText);
+        cfView = findViewById(R.id.cfText);
 
         // Reset errors.
         emailView.setError(null);
@@ -335,6 +314,7 @@ public class RegisterActivity extends AppCompatActivity implements OnCommandRece
             System.out.println("Step 1 compleato!");
             step = 1;
             mViewPager.setCurrentItem(step);
+            new GlideToast.makeToast(this, "Inserisci la documentazione adesso", GlideToast.LENGTHTOOLONG, GlideToast.INFOTOAST).show();
         }
     }
 
@@ -352,16 +332,17 @@ public class RegisterActivity extends AppCompatActivity implements OnCommandRece
 
             mainCore.getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.UPLOAD_DOCUMENT_REQUEST, carta), context);
             mainCore.getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.UPLOAD_DOCUMENT_REQUEST, mainCore.getUtente().getInfoUtente().getPatente()), context);
+            new GlideToast.makeToast(this, "Sto caricando i documenti... Attendi", GlideToast.LENGTHTOOLONG, GlideToast.INFOTOAST).show();
 
         } else {
-
+            new GlideToast.makeToast(this, "Devi selezionare entrambi i documenti", GlideToast.LENGTHTOOLONG, GlideToast.WARNINGTOAST).show();
             System.out.println("Nessun file selezionato");
         }
     }
 
     public void FineFase3(View view){
-        ccView = (EditText) findViewById(R.id.ccText);
-        cvvView = (EditText) findViewById(R.id.cvvText);
+        ccView = findViewById(R.id.ccText);
+        cvvView = findViewById(R.id.cvvText);
 
         // Reset errors.
         ccView.setError(null);
@@ -410,6 +391,7 @@ public class RegisterActivity extends AppCompatActivity implements OnCommandRece
             CartaCredito cc = new CartaCredito(cardNumber, cvv);
             mainCore.getUtente().getInfoUtente().setCarta(cc);
             System.out.println("Step 3 compleato!");
+            new GlideToast.makeToast(RegisterActivity.this, "Sto terminando la registrazione...", GlideToast.LENGTHTOOLONG, GlideToast.INFOTOAST).show();
 
 
             mainCore.getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.REGISTER_REQUEST, mainCore.getUtente()), this);
@@ -436,13 +418,13 @@ public class RegisterActivity extends AppCompatActivity implements OnCommandRece
 
             if(mainCore.getUtente().getInfoUtente().getPatente().getDocumentFileName().length() > 5 && mainCore.getUtente().getInfoUtente().getCartaIdentita().getDocumentFileName().length() > 5){
                 System.out.println("Step 2 completato");
-                //ProgressLoadingJIGB.finishLoadingJIGB(this);
 
                 Handler mainHandler = new Handler(Looper.getMainLooper());
 
                 Runnable myRunnable = new Runnable() {
                     @Override
                     public void run() {
+                        new GlideToast.makeToast(RegisterActivity.this, "Documenti caricati correttamente!", GlideToast.LENGTHTOOLONG, GlideToast.SUCCESSTOAST).show();
                         step++;
                         mViewPager.setCurrentItem(step);
                     }
@@ -456,6 +438,7 @@ public class RegisterActivity extends AppCompatActivity implements OnCommandRece
         if(cmd.getType() == CommandsEnum.CommandType.REGISTER_RESPONSE){
             String response = (String) cmd.getArg();
             if(response.length() == 2){
+                mainCore.getClient().UnregisterListener(this);
                 Handler mainHandler = new Handler(Looper.getMainLooper());
 
                 Runnable myRunnable = new Runnable() {
@@ -468,6 +451,17 @@ public class RegisterActivity extends AppCompatActivity implements OnCommandRece
 
             } else {
                 System.out.println(response);
+                Handler mainHandler = new Handler(Looper.getMainLooper());
+
+                Runnable myRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        new GlideToast.makeToast(RegisterActivity.this, "Errore nella registrazione!", GlideToast.LENGTHTOOLONG, GlideToast.FAILTOAST);
+
+                    }
+                };
+                mainHandler.post(myRunnable);
+
             }
         }
     }

@@ -3,13 +3,14 @@ package com.example.drivepay;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.KeyEvent;
@@ -21,6 +22,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.drivepay.Connection.OnCommandReceivedListener;
+import com.jeevandeshmukh.glidetoastlib.GlideToast;
 
 import org.apache.commons.validator.routines.EmailValidator;
 
@@ -38,16 +40,6 @@ public class LoginActivity extends AppCompatActivity {
      */
     private static final int REQUEST_READ_CONTACTS = 0;
 
-    /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
-    };
-    /**
-     * Keep track of the login task to ensure we can cancel it if requested.
-     */
     private UserLoginTask mAuthTask = null;
 
     // UI references.
@@ -62,9 +54,9 @@ public class LoginActivity extends AppCompatActivity {
         mainCore.getInstance();
         setContentView(R.layout.activity_login);
         // Set up the login form.
-        mEmailView = (EditText) findViewById(R.id.email);
+        mEmailView = findViewById(R.id.email);
 
-        mPasswordView = (EditText) findViewById(R.id.password);
+        mPasswordView = findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
@@ -76,7 +68,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
+        Button mEmailSignInButton = findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -84,7 +76,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        Button registerButton = (Button) findViewById(R.id.registerButton);
+        Button registerButton = findViewById(R.id.registerButton);
         registerButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -166,12 +158,12 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
+
         return EmailValidator.getInstance().isValid(email);
     }
 
     private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
+
         return password.length() > 4 && password.length() < 15;
     }
 
@@ -234,12 +226,20 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
 
             try {
                 // Simulate network access.
               mainCore.getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.LOGIN_REQUEST, new Utente(mEmail, mPassword)), this);
+                Handler mainHandler = new Handler(Looper.getMainLooper());
 
+                Runnable myRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        new GlideToast.makeToast(LoginActivity.this, "Sto contattando il server...", GlideToast.LENGTHTOOLONG, GlideToast.INFOTOAST).show();
+
+                    }
+                };
+                mainHandler.post(myRunnable);
             } catch (Exception e) {
                 System.out.println(e);
                 return false;
@@ -253,11 +253,8 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
 
-            if(mainCore.getUtente() != null) {
-                return true;
-            }
+            return mainCore.getUtente() != null;
 
-            return false;
         }
 
         Command response = null;
@@ -269,6 +266,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 if(usr != null){
                     mainCore.setUtente(usr);
+                    mainCore.getClient().UnregisterListener(this);
                 }
 
                 response = cmd;
@@ -282,13 +280,11 @@ public class LoginActivity extends AppCompatActivity {
 
             if (success) {
                 SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
-                prefs.edit().putString("EMAIL", mainCore.getUtente().getEmail());
-                prefs.edit().putString("PASSWORD", mainCore.getUtente().getPassword());
-                prefs.edit().putString("SAVED_USER","");
-                prefs.edit().apply();
-                Intent i = new Intent(context, MainActivity.class); // Your list's Intent
-                i.setFlags(i.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY); // Adds the FLAG_ACTIVITY_NO_HISTORY flag
-                startActivity(i);
+                prefs.edit().putString("EMAIL", mainCore.getUtente().getEmail()).apply();
+                prefs.edit().putString("PASSWORD", mainCore.getUtente().getPassword()).apply();
+                prefs.edit().putString("SAVED_USER", "").apply();
+
+                startActivity(new Intent(context, MainActivity.class));
 
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
