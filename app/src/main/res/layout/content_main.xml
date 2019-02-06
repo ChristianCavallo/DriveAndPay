@@ -11,94 +11,376 @@
 
 
     <LinearLayout
-        android:id="@+id/linearLayout6"
+        android:id="@+id/mainLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="visible">
 
         <LinearLayout
-            android:id="@+id/carburanteLayout"
+            android:id="@+id/linearLayout6"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:visibility="gone">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-            <ImageView
-                android:id="@+id/imageView2"
-                android:layout_width="140dp"
-                android:layout_height="100dp"
-                android:layout_weight="0"
-                android:scaleType="fitCenter"
-                android:visibility="visible"
-                app:srcCompat="@mipmap/car" />
+            <LinearLayout
+                android:id="@+id/carburanteLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/imageView2"
+                    android:layout_width="140dp"
+                    android:layout_height="100dp"
+                    android:layout_weight="0"
+                    android:scaleType="fitCenter"
+                    android:visibility="visible"
+                    app:srcCompat="@mipmap/car" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <SeekBar
+                        android:id="@+id/carburanteBar"
+                        style="@android:style/Widget.SeekBar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0"
+                        android:background="@color/common_google_signin_btn_text_dark_default"
+                        android:clickable="false"
+                        android:max="100"
+                        android:progress="90" />
+
+                    <TextView
+                        android:id="@+id/carburanteText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0"
+                        android:gravity="center"
+                        android:text="LIVELLO CARBURANTE: 90%"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <fragment
+                android:id="@+id/map"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="0"
-                android:gravity="center"
-                android:orientation="vertical">
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
-                <SeekBar
-                    android:id="@+id/carburanteBar"
-                    style="@android:style/Widget.SeekBar"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0"
-                    android:background="@color/common_google_signin_btn_text_dark_default"
-                    android:clickable="false"
-                    android:max="100"
-                    android:progress="90" />
+                <Button
+                    android:id="@+id/noleggioButton"
+                    style="@style/Widget.AppCompat.Button.Colored"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="Noleggia"
+                    android:visibility="visible"
+                    app:layout_constraintEnd_toStartOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/map" />
 
-                <TextView
-                    android:id="@+id/carburanteText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0"
-                    android:gravity="center"
-                    android:text="LIVELLO CARBURANTE: 90%"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+                <Button
+                    android:id="@+id/prenotazioneButton"
+                    style="@style/Widget.AppCompat.Button.Colored"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:onClick="RichiediPrenotazione"
+                    android:text="Prenota" />
             </LinearLayout>
 
         </LinearLayout>
+    </LinearLayout>
 
-        <fragment
-            android:id="@+id/map"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
+    <LinearLayout
+        android:id="@+id/prenotazioneLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <net.crosp.libs.android.circletimeview.CircleTimeView
+            android:id="@+id/prenotazioneTimerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_weight="0.9"
+            app:ctvCircleButtonColor="#099ef4"
+            app:ctvCircleColor="@color/colorPrimaryDark"
+            app:ctvCircleHandButtonRadius="10dp"
+            app:ctvCirclePressedButtonColor="#08bfdf"
+            app:ctvCircleStrokeWidth="1dp"
+            app:ctvCurrentTimeInSeconds="160"
+            app:ctvHighlightMarkLineColor="@color/colorPrimary"
+            app:ctvLabelText="PRENOTAZIONE IN CORSO"
+            app:ctvLabelTextColor="@color/colorAccent"
+            app:ctvLabelTextSize="18sp"
+            app:ctvLapBackgroundColor="@color/colorAccent"
+            app:ctvLapLabelMarginTop="15dp"
+            app:ctvLapLabelTextSize="12sp"
+            app:ctvLapTextColor="#fff"
+            app:ctvMarginTopLabel="22dp"
+            app:ctvMarkLineColor="#ffcdd2"
+            app:ctvMarkLineWidth="1dp"
+            app:ctvMarkSize="10dp"
+            app:ctvMinutesMarkCount="120"
+            app:ctvMultiLapRotation="true"
+            app:ctvPaddingInnerRadius="15dp"
+            app:ctvPaddingQuarterNumber="5dp"
+            app:ctvQuarterMarkSize="20dp"
+            app:ctvQuarterNumberColor="@color/colorAccent"
+            app:ctvQuarterNumberTextSize="16sp"
+            app:ctvShowLaps="true"
+            app:ctvTimeFormat="seconds_minutes"
+            app:ctvTimeMode="manual"
+            app:ctvTimeNumberColor="@color/colorPrimaryDark"
+            app:ctvTimeNumbersTextSize="55sp" />
+
+        <Button
+            android:id="@+id/terminaPrenotazioneButton"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="16dp"
+            android:onClick="TerminaPrenotazione"
+            android:text="Termina Prenotazione" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/postPrenotazioneLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <Button
+            android:id="@+id/MostraFatturaPrenotazioneButton"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:onClick="MostraFatturaPrenotazione"
+            android:text="VISUALIZZA FATTURA"
+            android:textColor="#fff" />
+
+        <Button
+            android:id="@+id/ChiudiPrenotazioneButton"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:onClick="Home"
+            android:text="Chiudi" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/fatturaPrenotazioneLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/noleggioButton"
-                style="@style/Widget.AppCompat.Button.Colored"
+            <TextView
+                android:id="@+id/textView12"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:text="Noleggia"
-                android:visibility="visible"
-                app:layout_constraintEnd_toStartOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/map" />
+                android:layout_height="wrap_content"
+                android:text="PRENOTAZIONE"
+                android:textSize="30sp" />
 
-            <Button
-                android:id="@+id/button3"
-                style="@style/Widget.AppCompat.Button.Colored"
+            <TextView
+                android:id="@+id/prenotazioneIdText"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Prenota" />
+                android:gravity="right"
+                android:text="205869879"
+                android:textSize="30sp"
+                android:textStyle="bold" />
         </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/textView11"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="VEICOLO"
+                android:textSize="30sp" />
+
+            <TextView
+                android:id="@+id/veicoloIdText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="right"
+                android:text="1111"
+                android:textSize="30sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/textView10"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="INIZIO"
+                android:textSize="30sp" />
+
+            <TextView
+                android:id="@+id/inizioText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="right"
+                android:text="03/02/2019 12:32"
+                android:textSize="30sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/textView9"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="FINE"
+                android:textSize="30sp" />
+
+            <TextView
+                android:id="@+id/fineText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="right"
+                android:text="03/02/2019 12:32"
+                android:textSize="30sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <View
+            android:id="@+id/divider2"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/colorPrimaryDark" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/textView28"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TARIFFA"
+                android:textSize="30sp" />
+
+            <TextView
+                android:id="@+id/tariffaText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="right"
+                android:text="0,15€ al min"
+                android:textSize="30sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/textView7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="DURATA DA PAGARE"
+                android:textSize="30sp" />
+
+            <TextView
+                android:id="@+id/durataText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="right"
+                android:text="10 min"
+                android:textSize="30sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/colorPrimaryDark" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/textView6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="COSTO TOTALE"
+                android:textSize="30sp" />
+
+            <TextView
+                android:id="@+id/costoText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="right"
+                android:text="2,45€"
+                android:textSize="36sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/chiudiButton"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:layout_marginBottom="32dp"
+            android:onClick="Home"
+            android:text="chiudi" />
 
     </LinearLayout>
 

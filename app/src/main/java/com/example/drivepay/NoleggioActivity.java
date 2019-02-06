@@ -222,7 +222,7 @@ public class NoleggioActivity extends AppCompatActivity implements OnCommandRece
     }
 
     public void MostraFattura(View view) {
-        mainCore.getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.GET_FATTURA_REQUEST, mainCore.getNoleggioCorrente()), this);
+        mainCore.getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.GET_FATTURA_NOLEGGIO_REQUEST, mainCore.getNoleggioCorrente()), this);
         new GlideToast.makeToast(NoleggioActivity.this, "Richiedo la fattura...", GlideToast.LENGTHTOOLONG, GlideToast.INFOTOAST).show();
 
     }
@@ -262,6 +262,7 @@ public class NoleggioActivity extends AppCompatActivity implements OnCommandRece
     }
 
     public void ChiudiNoleggio(View view) {
+        mainCore.setNoleggioCorrente(null);
         finish();
     }
 
@@ -296,7 +297,6 @@ public class NoleggioActivity extends AppCompatActivity implements OnCommandRece
                     Runnable myRunnable = new Runnable() {
                         @Override
                         public void run() {
-                            new GlideToast.makeToast(NoleggioActivity.this, "Autorizzazione al noleggio ottenuta!", GlideToast.LENGTHTOOLONG, GlideToast.SUCCESSTOAST).show();
                             configurazioneLayout.setEnabled(true);
                             configurazioneLayout.setVisibility(View.VISIBLE);
                         }
@@ -419,7 +419,7 @@ public class NoleggioActivity extends AppCompatActivity implements OnCommandRece
                 }
                 break;
 
-            case GET_FATTURA_RESPONSE:
+            case GET_FATTURA_NOLEGGIO_RESPONSE:
                 Fattura f = (Fattura) cmd.getArg();
                 if (f != null) {
                     mainCore.getNoleggioCorrente().setFatturaCorrente(f);
@@ -445,7 +445,10 @@ public class NoleggioActivity extends AppCompatActivity implements OnCommandRece
                     };
                     mainHandler.post(myRunnable);
                 }
+                break;
         }
+
+        mainCore.getClient().UnregisterListener(this);
     }
 
 }

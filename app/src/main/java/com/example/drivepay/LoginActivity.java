@@ -271,6 +271,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 response = cmd;
             }
+            mainCore.getClient().UnregisterListener(this);
         }
 
         @Override

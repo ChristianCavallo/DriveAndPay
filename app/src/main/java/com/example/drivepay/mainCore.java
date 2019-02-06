@@ -1,6 +1,6 @@
 package com.example.drivepay;
 
-import com.example.drivepay.Connection.TestClient;
+import com.example.drivepay.Connection.Client;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -8,6 +8,7 @@ import java.util.Locale;
 
 import SerializedObjects.UserObjects.Utente;
 import SerializedObjects.coreObjects.Noleggio;
+import SerializedObjects.coreObjects.Prenotazione;
 
 import static java.util.Calendar.DATE;
 import static java.util.Calendar.MONTH;
@@ -20,17 +21,18 @@ class mainCore {
         return ourInstance;
     }
 
-    private static final TestClient client = new TestClient("10.0.2.2", 9696);
+    // LOCAL private static final Client client = new Client("10.0.2.2", 9696);
+    private static final Client client = new Client("212.24.111.96", 9696); //REMOTE
     private static Utente utente;
     private static Noleggio noleggioCorrente;
+    private static Prenotazione prenotazioneCorrente;
 
     private mainCore() {
     }
 
-    public static TestClient getClient() {
+    public static Client getClient() {
         return client;
     }
-
 
     public static Utente getUtente() {
         return utente;
@@ -46,6 +48,14 @@ class mainCore {
 
     public static void setNoleggioCorrente(Noleggio noleggioCorrente) {
         mainCore.noleggioCorrente = noleggioCorrente;
+    }
+
+    public static Prenotazione getPrenotazioneCorrente() {
+        return prenotazioneCorrente;
+    }
+
+    public static void setPrenotazioneCorrente(Prenotazione prenotazioneCorrente) {
+        mainCore.prenotazioneCorrente = prenotazioneCorrente;
     }
 
     public static int getDiffYears(Date first, Date last) {

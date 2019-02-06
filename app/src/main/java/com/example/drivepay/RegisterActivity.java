@@ -138,14 +138,18 @@ public class RegisterActivity extends AppCompatActivity implements OnCommandRece
                 //Handle the images
                 byte[] getBytes = {};
                 Bitmap x;
+                System.out.println("File Originale: " + imageFile.length() / 1024 + "kb");
                 try {
                     c.setCompressFormat(Bitmap.CompressFormat.PNG);
-                    c.setQuality(80);
+                    c.setQuality(60);
 
                     x = c.compressToBitmap(imageFile);
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                    x.compress(Bitmap.CompressFormat.PNG, 80, stream);
+                    x.compress(Bitmap.CompressFormat.JPEG, 60, stream);
+
                    getBytes = stream.toByteArray();
+
+
                 } catch (IOException e) {
                     e.printStackTrace();
                     return;
@@ -324,15 +328,19 @@ public class RegisterActivity extends AppCompatActivity implements OnCommandRece
         mViewPager.setCurrentItem(step);
     }
 
+    int uploadFase = 0;
     public void AvantiFase2(View view){
         Documento carta = mainCore.getUtente().getInfoUtente().getCartaIdentita();
         Documento patente = mainCore.getUtente().getInfoUtente().getPatente();
 
         if(carta != null && patente != null){
 
-            mainCore.getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.UPLOAD_DOCUMENT_REQUEST, carta), context);
-            mainCore.getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.UPLOAD_DOCUMENT_REQUEST, mainCore.getUtente().getInfoUtente().getPatente()), context);
-            new GlideToast.makeToast(this, "Sto caricando i documenti... Attendi", GlideToast.LENGTHTOOLONG, GlideToast.INFOTOAST).show();
+            if (uploadFase == 0) {
+                System.out.println("Dimensione foto carta: " + carta.getRaw().length / 1024 + "kb");
+                mainCore.getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.UPLOAD_DOCUMENT_REQUEST, carta), context);
+                new GlideToast.makeToast(this, "Sto caricando i documenti... Attendi", GlideToast.LENGTHTOOLONG, GlideToast.INFOTOAST).show();
+                uploadFase++;
+            }
 
         } else {
             new GlideToast.makeToast(this, "Devi selezionare entrambi i documenti", GlideToast.LENGTHTOOLONG, GlideToast.WARNINGTOAST).show();
@@ -409,11 +417,25 @@ public class RegisterActivity extends AppCompatActivity implements OnCommandRece
                 String docname = (String) cmd.getArg();
                 if(docname.contains("patente")){
                     mainCore.getUtente().getInfoUtente().getPatente().setDocumentFileName(docname);
+                    uploadFase = 0;
                 } else{
                     mainCore.getUtente().getInfoUtente().getCartaIdentita().setDocumentFileName(docname);
+                    Handler mainHandler = new Handler(Looper.getMainLooper());
+
+                    Runnable myRunnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            System.out.println("Dimensione foto carta: " + mainCore.getUtente().getInfoUtente().getPatente().getRaw().length / 1024 + "kb");
+                            new GlideToast.makeToast(RegisterActivity.this, "Upload patente...", GlideToast.LENGTHTOOLONG, GlideToast.INFOTOAST).show();
+                            mainCore.getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.UPLOAD_DOCUMENT_REQUEST, mainCore.getUtente().getInfoUtente().getPatente()), context);
+                        }
+                    };
+                    mainHandler.post(myRunnable);
+
                 }
             } else {
                 System.out.println("Errore nell'upload dei documenti");
+                return;
             }
 
             if(mainCore.getUtente().getInfoUtente().getPatente().getDocumentFileName().length() > 5 && mainCore.getUtente().getInfoUtente().getCartaIdentita().getDocumentFileName().length() > 5){

@@ -19,13 +19,12 @@ import java.util.Iterator;
 
 import SerializedObjects.Command;
 import SerializedObjects.CommandsEnum;
-import SerializedObjects.UserObjects.InformazioniUtente;
 
 /**
  *
  * @author Christian
  */
-public class TestClient extends Thread {
+public class Client extends Thread {
 
     private final String ip;
     private final Integer port;
@@ -35,23 +34,48 @@ public class TestClient extends Thread {
 
     private ArrayList<OnCommandReceivedListener> listeners= new ArrayList<>();
 
-    public TestClient(String ip, Integer port) {
+    public Client(String ip, Integer port) {
 
         this.ip = ip;
         this.port = port;
         this.encryption = new AES("FB26E3BE8631A6A5");
+        autoconnect();
+    }
 
-        new Thread(this).start();
+    private void autoconnect() {
+        final Client t = this;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    if (sock == null) {
+                        System.out.println("Non connesso al server!");
+                        try {
+                            sock = new Socket(ip, port);
+                            sock.setKeepAlive(true);
+                            new Thread(t).start();
+                            System.out.println("Connessione Stabilita!");
+                        } catch (IOException ex) {
+
+                        }
+                    }
+
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+
+            }
+        }).start();
+
     }
 
     @Override
     public void run() {
-        try {
-            this.sock = new Socket(this.ip, this.port);
-            this.sock.setKeepAlive(true);
-        } catch (IOException ex) {
 
-        }
         try {
           SendCommand(new Command(CommandsEnum.CommandType.HANDSHAKE_REQUEST, null));
           DataInputStream inData = new DataInputStream(this.sock.getInputStream());
@@ -80,13 +104,14 @@ public class TestClient extends Thread {
         } catch (Exception ex) {
             System.out.println("Errore nel test client socket: " + ex.getMessage());
         }
+        try {
+            this.sock.close();
+        } catch (Exception e) {
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                RecoverConnection();
-            }
-        }).start();
+        }
+
+        this.sock = null;
+        Thread.currentThread().interrupt();
     }
 
     public void notifyListeners(Command c) {
@@ -113,7 +138,10 @@ public class TestClient extends Thread {
     public void RecoverConnection(){
         while(true){
             try {
-                Thread.sleep(5000);
+                if (this.sock != null) {
+                    this.sock.close();
+                }
+                Thread.sleep(1000);
                 this.sock = new Socket(this.ip, this.port);
                 this.sock.setKeepAlive(true);
                 new Thread(this).start();
@@ -145,7 +173,15 @@ public class TestClient extends Thread {
     }
 
     public void SendCommandAsync(final Command cmd, OnCommandReceivedListener listener){
-        System.out.println("Sending Async command");
+        if (this.sock == null) {
+            System.out.println("Non sono connesso!");
+            return;
+        }
+
+        if (!this.sock.isConnected() || this.sock.isClosed()) {
+            return;
+        }
+
         new Thread(new Runnable() {
 
             @Override
@@ -155,7 +191,7 @@ public class TestClient extends Thread {
             }
         }).start();
         registerListenerByCommand(listener);
-        System.out.println("Listener registered: " + listeners.size());
+
     }
 
     private void registerListenerByCommand(OnCommandReceivedListener mListener)
@@ -175,13 +211,8 @@ public class TestClient extends Thread {
             case HANDSHAKE_RESPONSE:
                 System.out.println("Handshaked");
                 break;
-            case LOGIN_RESPONSE:
-                InformazioniUtente U = (InformazioniUtente) cmd.getArg();
-                break;
-            case UPLOAD_DOCUMENT_RESPONSE:
-                break;
             default:
-                System.out.println("Received an unknown command: " + cmd.toString());
+                // System.out.println("Received an unknown command: " + cmd.toString());
 
         }
 
