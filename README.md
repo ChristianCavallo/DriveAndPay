@@ -4,11 +4,11 @@ Progetto basato su un'applicazione per android in comunicazione remota ad un ser
 Attualmente sono state sviluppata queste funzioni:
 - Registrazione al sistema
 - Noleggio di un veicolo
-
-Da fare:
 - Terminazione Noleggio e fattura
 - Prenotazione di un veicolo
 - Terminazione prenotazione
+
+Repository del server: https://github.com/ChristianCavallo/DriveAndPay---Server
 
 Progetto modellato e sviluppato dagli ingegneri:
 - Noemi Buggea
