@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import SerializedObjects.Command;
 import SerializedObjects.CommandsEnum;
@@ -157,13 +158,13 @@ public class RegisterActivity extends AppCompatActivity implements OnCommandRece
                 Documento d = new Documento(1, "");
                 d.setRaw(getBytes);
                 if(type == 1){
-                    mainCore.getUtente().getInfoUtente().setCartaIdentita(d);
+                    mainCore.getInstance().getUtente().getInfoUtente().setCartaIdentita(d);
                     System.out.println("Carta d'identità selezionata: " + getBytes.length / 1024 + "kb");
                     cartaView.setImageBitmap(x);
 
                 } else {
                     d.setTipo(2);
-                    mainCore.getUtente().getInfoUtente().setPatente(d);
+                    mainCore.getInstance().getUtente().getInfoUtente().setPatente(d);
                     System.out.println("Patente selezionata: " + getBytes.length / 1024 + "kb");
                     patenteView.setImageBitmap(x);
                 }
@@ -284,7 +285,7 @@ public class RegisterActivity extends AppCompatActivity implements OnCommandRece
                 nascitaView.setError(getString(R.string.error_field_required));
                 focusView = nascitaView;
                 cancel = true;
-            } else if (mainCore.getDiffYears(date, new Date())< 18) {
+            } else if (getDiffYears(date, new Date()) < 18) {
                 nascitaView.setError("Devi essere maggiorenne per registrarti!");
                 focusView = nascitaView;
                 cancel = true;
@@ -314,7 +315,7 @@ public class RegisterActivity extends AppCompatActivity implements OnCommandRece
             Utente u = new Utente(email.trim(), password.trim());
             InformazioniUtente i = new InformazioniUtente(nome.trim(), cognome.trim(), nascita.trim(), cf.trim());
             u.setInfoUtente(i);
-            mainCore.setUtente(u);
+            mainCore.getInstance().setUtente(u);
             System.out.println("Step 1 compleato!");
             step = 1;
             mViewPager.setCurrentItem(step);
@@ -322,6 +323,10 @@ public class RegisterActivity extends AppCompatActivity implements OnCommandRece
         }
     }
 
+    public int getDiffYears(Date first, Date last) {
+        Long diff = TimeUnit.MILLISECONDS.toDays(last.getTime() - first.getTime()) / 365;
+        return diff.intValue();
+    }
 
     public void IndietroFase(View view){
         step--;
@@ -330,14 +335,14 @@ public class RegisterActivity extends AppCompatActivity implements OnCommandRece
 
     int uploadFase = 0;
     public void AvantiFase2(View view){
-        Documento carta = mainCore.getUtente().getInfoUtente().getCartaIdentita();
-        Documento patente = mainCore.getUtente().getInfoUtente().getPatente();
+        Documento carta = mainCore.getInstance().getUtente().getInfoUtente().getCartaIdentita();
+        Documento patente = mainCore.getInstance().getUtente().getInfoUtente().getPatente();
 
         if(carta != null && patente != null){
 
             if (uploadFase == 0) {
                 System.out.println("Dimensione foto carta: " + carta.getRaw().length / 1024 + "kb");
-                mainCore.getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.UPLOAD_DOCUMENT_REQUEST, carta), context);
+                mainCore.getInstance().getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.UPLOAD_DOCUMENT_REQUEST, carta), context);
                 new GlideToast.makeToast(this, "Sto caricando i documenti... Attendi", GlideToast.LENGTHTOOLONG, GlideToast.INFOTOAST).show();
                 uploadFase++;
             }
@@ -397,12 +402,12 @@ public class RegisterActivity extends AppCompatActivity implements OnCommandRece
         } else {
 
             CartaCredito cc = new CartaCredito(cardNumber, cvv);
-            mainCore.getUtente().getInfoUtente().setCarta(cc);
+            mainCore.getInstance().getUtente().getInfoUtente().setCarta(cc);
             System.out.println("Step 3 compleato!");
             new GlideToast.makeToast(RegisterActivity.this, "Sto terminando la registrazione...", GlideToast.LENGTHTOOLONG, GlideToast.INFOTOAST).show();
 
 
-            mainCore.getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.REGISTER_REQUEST, mainCore.getUtente()), this);
+            mainCore.getInstance().getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.REGISTER_REQUEST, mainCore.getInstance().getUtente()), this);
 
         }
 
@@ -416,18 +421,18 @@ public class RegisterActivity extends AppCompatActivity implements OnCommandRece
             if(cmd.getArg() != "Errore"){
                 String docname = (String) cmd.getArg();
                 if(docname.contains("patente")){
-                    mainCore.getUtente().getInfoUtente().getPatente().setDocumentFileName(docname);
+                    mainCore.getInstance().getUtente().getInfoUtente().getPatente().setDocumentFileName(docname);
                     uploadFase = 0;
                 } else{
-                    mainCore.getUtente().getInfoUtente().getCartaIdentita().setDocumentFileName(docname);
+                    mainCore.getInstance().getUtente().getInfoUtente().getCartaIdentita().setDocumentFileName(docname);
                     Handler mainHandler = new Handler(Looper.getMainLooper());
 
                     Runnable myRunnable = new Runnable() {
                         @Override
                         public void run() {
-                            System.out.println("Dimensione foto carta: " + mainCore.getUtente().getInfoUtente().getPatente().getRaw().length / 1024 + "kb");
+                            System.out.println("Dimensione foto carta: " + mainCore.getInstance().getUtente().getInfoUtente().getPatente().getRaw().length / 1024 + "kb");
                             new GlideToast.makeToast(RegisterActivity.this, "Upload patente...", GlideToast.LENGTHTOOLONG, GlideToast.INFOTOAST).show();
-                            mainCore.getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.UPLOAD_DOCUMENT_REQUEST, mainCore.getUtente().getInfoUtente().getPatente()), context);
+                            mainCore.getInstance().getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.UPLOAD_DOCUMENT_REQUEST, mainCore.getInstance().getUtente().getInfoUtente().getPatente()), context);
                         }
                     };
                     mainHandler.post(myRunnable);
@@ -438,7 +443,7 @@ public class RegisterActivity extends AppCompatActivity implements OnCommandRece
                 return;
             }
 
-            if(mainCore.getUtente().getInfoUtente().getPatente().getDocumentFileName().length() > 5 && mainCore.getUtente().getInfoUtente().getCartaIdentita().getDocumentFileName().length() > 5){
+            if (mainCore.getInstance().getUtente().getInfoUtente().getPatente().getDocumentFileName().length() > 5 && mainCore.getInstance().getUtente().getInfoUtente().getCartaIdentita().getDocumentFileName().length() > 5) {
                 System.out.println("Step 2 completato");
 
                 Handler mainHandler = new Handler(Looper.getMainLooper());
@@ -460,7 +465,7 @@ public class RegisterActivity extends AppCompatActivity implements OnCommandRece
         if(cmd.getType() == CommandsEnum.CommandType.REGISTER_RESPONSE){
             String response = (String) cmd.getArg();
             if(response.length() == 2){
-                mainCore.getClient().UnregisterListener(this);
+                mainCore.getInstance().getClient().UnregisterListener(this);
                 Handler mainHandler = new Handler(Looper.getMainLooper());
 
                 Runnable myRunnable = new Runnable() {

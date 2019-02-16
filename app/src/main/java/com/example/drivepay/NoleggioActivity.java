@@ -85,7 +85,7 @@ public class NoleggioActivity extends AppCompatActivity implements OnCommandRece
         noleggioLayout.setVisibility(View.GONE);
         postnoleggioLayout.setVisibility(View.GONE);
         fatturaLayout.setVisibility(View.GONE);
-        mainCore.getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.EXIST_NOLEGGIO_REQUEST, mainCore.getUtente()), this);
+        mainCore.getInstance().getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.EXIST_NOLEGGIO_REQUEST, mainCore.getInstance().getUtente()), this);
     }
 
     @Override
@@ -132,17 +132,17 @@ public class NoleggioActivity extends AppCompatActivity implements OnCommandRece
             focusView.requestFocus();
         } else {
 
-            mainCore.getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.VEICOLO_REQUEST, Integer.parseInt(num_v)), this);
+            mainCore.getInstance().getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.VEICOLO_REQUEST, Integer.parseInt(num_v)), this);
             new GlideToast.makeToast(this, "Sto confermando il veicolo...", GlideToast.LENGTHTOOLONG, GlideToast.INFOTOAST).show();
             configurazioneLayout.setEnabled(false);
         }
     }
 
     public void confermaNoleggio(View view) {
-        if (mainCore.getNoleggioCorrente().getVeicoloCorrente() == null) {
+        if (mainCore.getInstance().getNoleggioCorrente().getVeicoloCorrente() == null) {
             new GlideToast.makeToast(this, "Veicolo non confermato", GlideToast.LENGTHTOOLONG, GlideToast.FAILTOAST).show();
         } else {
-            mainCore.getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.NOLEGGIO_REQUEST, mainCore.getNoleggioCorrente()), this);
+            mainCore.getInstance().getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.NOLEGGIO_REQUEST, mainCore.getInstance().getNoleggioCorrente()), this);
             new GlideToast.makeToast(this, "Sto richiedendo l'avvio...", GlideToast.LENGTHTOOLONG, GlideToast.INFOTOAST).show();
             configurazioneLayout.setEnabled(false);
         }
@@ -171,7 +171,7 @@ public class NoleggioActivity extends AppCompatActivity implements OnCommandRece
             focusView.requestFocus();
         } else {
 
-            mainCore.getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.SCONTO_REQUEST, sconto), this);
+            mainCore.getInstance().getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.SCONTO_REQUEST, sconto), this);
             new GlideToast.makeToast(this, "Sto controllando lo sconto...", GlideToast.LENGTHTOOLONG, GlideToast.INFOTOAST).show();
             configurazioneLayout.setEnabled(false);
         }
@@ -204,7 +204,7 @@ public class NoleggioActivity extends AppCompatActivity implements OnCommandRece
 
     public void RecoverNoleggio() {
         AvviaNoleggio();
-        int secondsBetween = (int) ((new Date().getTime() - mainCore.getNoleggioCorrente().getInizio().getTime()) / 1000);
+        int secondsBetween = (int) ((new Date().getTime() - mainCore.getInstance().getNoleggioCorrente().getInizio().getTime()) / 1000);
         timerView.setCurrentTime(secondsBetween);
 
     }
@@ -212,7 +212,7 @@ public class NoleggioActivity extends AppCompatActivity implements OnCommandRece
     public void TerminaNoleggio(View view) {
         timerThread.interrupt();
         new GlideToast.makeToast(this, "Richiedo la terminazione del noleggio", GlideToast.LENGTHTOOLONG, GlideToast.INFOTOAST).show();
-        mainCore.getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.TERMINA_NOLEGGIO_REQUEST, mainCore.getUtente()), this);
+        mainCore.getInstance().getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.TERMINA_NOLEGGIO_REQUEST, mainCore.getInstance().getUtente()), this);
 
     }
 
@@ -222,7 +222,7 @@ public class NoleggioActivity extends AppCompatActivity implements OnCommandRece
     }
 
     public void MostraFattura(View view) {
-        mainCore.getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.GET_FATTURA_NOLEGGIO_REQUEST, mainCore.getNoleggioCorrente()), this);
+        mainCore.getInstance().getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.GET_FATTURA_NOLEGGIO_REQUEST, mainCore.getInstance().getNoleggioCorrente()), this);
         new GlideToast.makeToast(NoleggioActivity.this, "Richiedo la fattura...", GlideToast.LENGTHTOOLONG, GlideToast.INFOTOAST).show();
 
     }
@@ -232,7 +232,7 @@ public class NoleggioActivity extends AppCompatActivity implements OnCommandRece
             postnoleggioLayout.setVisibility(View.GONE);
             fatturaLayout.setVisibility(View.VISIBLE);
 
-            Noleggio n = mainCore.getNoleggioCorrente();
+            Noleggio n = mainCore.getInstance().getNoleggioCorrente();
             noleggioIdText.setText(Integer.toString(n.getId()));
             veicoloIdText.setText(Integer.toString(n.getVeicoloCorrente().getCodice()));
 
@@ -262,7 +262,7 @@ public class NoleggioActivity extends AppCompatActivity implements OnCommandRece
     }
 
     public void ChiudiNoleggio(View view) {
-        mainCore.setNoleggioCorrente(null);
+        mainCore.getInstance().setNoleggioCorrente(null);
         finish();
     }
 
@@ -276,7 +276,7 @@ public class NoleggioActivity extends AppCompatActivity implements OnCommandRece
                     finish();
                 }
 
-                mainCore.setNoleggioCorrente(n);
+                mainCore.getInstance().setNoleggioCorrente(n);
                 if (n.getInizio() != null) {
                     //Noleggio gia esistente
                     Handler mainHandler = new Handler(Looper.getMainLooper());
@@ -308,7 +308,7 @@ public class NoleggioActivity extends AppCompatActivity implements OnCommandRece
             case VEICOLO_RESPONSE:
                 Veicolo v = (Veicolo) cmd.getArg();
                 if (v != null) {
-                    mainCore.getNoleggioCorrente().setVeicoloCorrente(v);
+                    mainCore.getInstance().getNoleggioCorrente().setVeicoloCorrente(v);
                     Handler mainHandler = new Handler(Looper.getMainLooper());
 
                     Runnable myRunnable = new Runnable() {
@@ -336,7 +336,7 @@ public class NoleggioActivity extends AppCompatActivity implements OnCommandRece
             case SCONTO_RESPONSE:
                 Sconto s = (Sconto) cmd.getArg();
                 if (s != null) {
-                    mainCore.getNoleggioCorrente().setScontoCorrente(s);
+                    mainCore.getInstance().getNoleggioCorrente().setScontoCorrente(s);
                     Handler mainHandler = new Handler(Looper.getMainLooper());
 
                     Runnable myRunnable = new Runnable() {
@@ -422,7 +422,7 @@ public class NoleggioActivity extends AppCompatActivity implements OnCommandRece
             case GET_FATTURA_NOLEGGIO_RESPONSE:
                 Fattura f = (Fattura) cmd.getArg();
                 if (f != null) {
-                    mainCore.getNoleggioCorrente().setFatturaCorrente(f);
+                    mainCore.getInstance().getNoleggioCorrente().setFatturaCorrente(f);
                     Handler mainHandler = new Handler(Looper.getMainLooper());
 
                     Runnable myRunnable = new Runnable() {
@@ -448,7 +448,7 @@ public class NoleggioActivity extends AppCompatActivity implements OnCommandRece
                 break;
         }
 
-        mainCore.getClient().UnregisterListener(this);
+        mainCore.getInstance().getClient().UnregisterListener(this);
     }
 
 }

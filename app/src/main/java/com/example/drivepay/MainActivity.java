@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity
         noleggioButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mainCore.setNoleggioCorrente(null);
+                mainCore.getInstance().setNoleggioCorrente(null);
                 startActivity(new Intent(MainActivity.this, NoleggioActivity.class));
             }
         });
@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        mainCore.getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.EXIST_PRENOTAZIONE_REQUEST, mainCore.getUtente()), this);
+        mainCore.getInstance().getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.EXIST_PRENOTAZIONE_REQUEST, mainCore.getInstance().getUtente()), this);
 
     }
 
@@ -128,7 +128,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
-        mainCore.getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.GET_LISTA_VEICOLI_REQUEST, "per favore"), this);
+        mainCore.getInstance().getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.GET_LISTA_VEICOLI_REQUEST, "per favore"), this);
 
         googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
@@ -203,7 +203,7 @@ public class MainActivity extends AppCompatActivity
 
     public void RecoverPrenotazione() {
         avviaPrenotazione();
-        Long diff = 20 * 60 - TimeUnit.SECONDS.toSeconds(new Date().getTime() - mainCore.getPrenotazioneCorrente().getInizio().getTime());
+        Long diff = 20 * 60 - TimeUnit.SECONDS.toSeconds(new Date().getTime() - mainCore.getInstance().getPrenotazioneCorrente().getInizio().getTime());
         if (diff > 0) {
             timerPrenotazioneView.setCurrentTime(diff);
         } else {
@@ -226,10 +226,10 @@ public class MainActivity extends AppCompatActivity
             return;
         }
         Prenotazione p = new Prenotazione((int) (Math.random() * 999999999));
-        p.setUtente(mainCore.getUtente());
+        p.setUtente(mainCore.getInstance().getUtente());
         p.setVeicolo(veicoloCorrente);
-        mainCore.setPrenotazioneCorrente(p);
-        mainCore.getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.PRENOTAZIONE_REQUEST, mainCore.getPrenotazioneCorrente()), this);
+        mainCore.getInstance().setPrenotazioneCorrente(p);
+        mainCore.getInstance().getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.PRENOTAZIONE_REQUEST, mainCore.getInstance().getPrenotazioneCorrente()), this);
         new GlideToast.makeToast(MainActivity.this, "Richiedo la prenotazione...", GlideToast.LENGTHTOOLONG, GlideToast.INFOTOAST).show();
 
     }
@@ -248,7 +248,7 @@ public class MainActivity extends AppCompatActivity
 
         timerPrenotazioneView.stopTimer();
         new GlideToast.makeToast(this, "Richiedo la terminazione della prenotazione...", GlideToast.LENGTHTOOLONG, GlideToast.INFOTOAST).show();
-        mainCore.getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.TERMINA_PRENOTAZIONE_REQUEST, mainCore.getUtente()), this);
+        mainCore.getInstance().getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.TERMINA_PRENOTAZIONE_REQUEST, mainCore.getInstance().getUtente()), this);
 
     }
 
@@ -262,7 +262,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void MostraFatturaPrenotazione(View view) {
-        mainCore.getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.GET_FATTURA_PRENOTAZIONE_REQUEST, mainCore.getPrenotazioneCorrente()), this);
+        mainCore.getInstance().getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.GET_FATTURA_PRENOTAZIONE_REQUEST, mainCore.getInstance().getPrenotazioneCorrente()), this);
         new GlideToast.makeToast(MainActivity.this, "Richiedo la fattura...", GlideToast.LENGTHTOOLONG, GlideToast.INFOTOAST).show();
 
     }
@@ -274,7 +274,7 @@ public class MainActivity extends AppCompatActivity
             postprenotazioneLayout.setVisibility(View.GONE);
             fatturaPrenotazioneLayout.setVisibility(View.VISIBLE);
 
-            Prenotazione n = mainCore.getPrenotazioneCorrente();
+            Prenotazione n = mainCore.getInstance().getPrenotazioneCorrente();
             prenotazioneIdText.setText(Integer.toString(n.getId()));
             veicoloIdText.setText(Integer.toString(n.getVeicolo().getCodice()));
 
@@ -323,7 +323,7 @@ public class MainActivity extends AppCompatActivity
             case EXIST_PRENOTAZIONE_RESPONSE:
                 if (cmd.getArg() != null) {
                     Prenotazione p = (Prenotazione) cmd.getArg();
-                    mainCore.setPrenotazioneCorrente(p);
+                    mainCore.getInstance().setPrenotazioneCorrente(p);
                     Handler mainHandler = new Handler(Looper.getMainLooper());
 
                     Runnable myRunnable = new Runnable() {
@@ -346,7 +346,7 @@ public class MainActivity extends AppCompatActivity
                         @Override
                         public void run() {
                             new GlideToast.makeToast(MainActivity.this, "Prenotazione avviata correttamente!", GlideToast.LENGTHTOOLONG, GlideToast.SUCCESSTOAST).show();
-                            mainCore.getPrenotazioneCorrente().setInizio(new Date());
+                            mainCore.getInstance().getPrenotazioneCorrente().setInizio(new Date());
                             avviaPrenotazione();
                         }
                     };
@@ -398,7 +398,7 @@ public class MainActivity extends AppCompatActivity
             case GET_FATTURA_PRENOTAZIONE_RESPONSE:
                 Fattura f = (Fattura) cmd.getArg();
                 if (f != null) {
-                    mainCore.getPrenotazioneCorrente().setFattura(f);
+                    mainCore.getInstance().getPrenotazioneCorrente().setFattura(f);
                     Handler mainHandler = new Handler(Looper.getMainLooper());
 
                     Runnable myRunnable = new Runnable() {

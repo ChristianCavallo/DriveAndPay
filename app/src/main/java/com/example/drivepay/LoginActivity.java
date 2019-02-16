@@ -229,7 +229,7 @@ public class LoginActivity extends AppCompatActivity {
 
             try {
                 // Simulate network access.
-              mainCore.getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.LOGIN_REQUEST, new Utente(mEmail, mPassword)), this);
+                mainCore.getInstance().getClient().SendCommandAsync(new Command(CommandsEnum.CommandType.LOGIN_REQUEST, new Utente(mEmail, mPassword)), this);
                 Handler mainHandler = new Handler(Looper.getMainLooper());
 
                 Runnable myRunnable = new Runnable() {
@@ -253,7 +253,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
 
-            return mainCore.getUtente() != null;
+            return mainCore.getInstance().getUtente() != null;
 
         }
 
@@ -265,13 +265,13 @@ public class LoginActivity extends AppCompatActivity {
                 Utente usr = (Utente) cmd.getArg();
 
                 if(usr != null){
-                    mainCore.setUtente(usr);
-                    mainCore.getClient().UnregisterListener(this);
+                    mainCore.getInstance().setUtente(usr);
+                    mainCore.getInstance().getClient().UnregisterListener(this);
                 }
 
                 response = cmd;
             }
-            mainCore.getClient().UnregisterListener(this);
+            mainCore.getInstance().getClient().UnregisterListener(this);
         }
 
         @Override
@@ -281,8 +281,8 @@ public class LoginActivity extends AppCompatActivity {
 
             if (success) {
                 SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
-                prefs.edit().putString("EMAIL", mainCore.getUtente().getEmail()).apply();
-                prefs.edit().putString("PASSWORD", mainCore.getUtente().getPassword()).apply();
+                prefs.edit().putString("EMAIL", mainCore.getInstance().getUtente().getEmail()).apply();
+                prefs.edit().putString("PASSWORD", mainCore.getInstance().getUtente().getPassword()).apply();
                 prefs.edit().putString("SAVED_USER", "").apply();
 
                 startActivity(new Intent(context, MainActivity.class));
